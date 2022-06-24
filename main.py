@@ -401,6 +401,7 @@ def importUsers():
     token = request.args.get('token')
     dbSession = DB()
     if isAdminLogin(dbSession, username, token):
+        notImported = []
         existingClasses = [v[0] for v in dbSession.query(Classes.name).all()]
         existingUsers = [v[0] for v in dbSession.query(Users.username).all()]
         for k in data.keys():
@@ -416,10 +417,12 @@ def importUsers():
                     newUser = Users(username=user.lower(), startPassword=startPassword, password=hashlib.sha256(
                         startPassword.encode("utf-8")).hexdigest(), firstLogin=True, class_id=classId)
                     dbSession.add(newUser)
+                else:
+                    notImported.append(user)
             dbSession.commit()
         resp = make_response(
             jsonify(
-                {'status': 'imported'}))
+                {'status': 'imported', "ignored": notImported}))
     else:
         resp = make_response(
             jsonify(
