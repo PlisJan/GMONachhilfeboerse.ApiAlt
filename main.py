@@ -74,7 +74,7 @@ ORDER BY TakeLessons.id ASC
     """
 
 
-@app.route('/nachhilfeboerse/api/login', methods=['POST'])
+@app.route("/nachhilfeboerse/api/login", methods=["POST"])
 def login():
     requestData = json.loads(request.data)
     dbSession = DB()
@@ -84,7 +84,7 @@ def login():
     ).first()
     
     if loginData is None:
-        resp = make_response(jsonify({'status': False}))
+        resp = make_response(jsonify({"status": False}))
 
     elif (hash_pw(requestData.get("username"), requestData.get("password")) == loginData.password):
         token = secrets.token_urlsafe(256)
@@ -101,17 +101,17 @@ def login():
         )
         
     else:
-        resp = make_response(jsonify({'status': False}))
+        resp = make_response(jsonify({"status": False}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/logout', methods=['GET'])
+@app.route("/nachhilfeboerse/api/logout", methods=["GET"])
 def logout():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isLoggedIn(dbSession, username, token):
@@ -128,16 +128,16 @@ def logout():
             )
         )
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/changePassword', methods=['POST'])
+@app.route("/nachhilfeboerse/api/changePassword", methods=["POST"])
 def changePassword():
     data = json.loads(request.data)
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isLoggedIn(dbSession, username, token):
@@ -146,27 +146,27 @@ def changePassword():
         ).first()
         
         if loginData is None:
-            resp = make_response(jsonify({'status': False}))
+            resp = make_response(jsonify({"status": False}))
 
         elif (hash_pw(username, data.get("oldPassword")) == loginData.password):
             dbSession.query(Users).filter(
                 Users.username == loginData.username
             ).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
             dbSession.commit()
-            resp = make_response(jsonify({'status': True}))
+            resp = make_response(jsonify({"status": True}))
             
         else:
-            resp = make_response(jsonify({'status': False}))
+            resp = make_response(jsonify({"status": False}))
             
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/addPeronalData', methods=['POST'])
+@app.route("/nachhilfeboerse/api/addPeronalData", methods=["POST"])
 def addPeronalData():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     data = json.loads(request.data)
     dbSession = DB()
     
@@ -181,7 +181,7 @@ def addPeronalData():
     else:
         resp = make_response(jsonify({"status": False}))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
@@ -202,7 +202,7 @@ def isAdminLogin(dbSession, username, token):
     return False
 
 
-@app.route('/nachhilfeboerse/api/getSubjects', methods=['GET'])
+@app.route("/nachhilfeboerse/api/getSubjects", methods=["GET"])
 def getSubjects():
 
     dbSession = DB()
@@ -211,16 +211,16 @@ def getSubjects():
 
     resp = make_response(jsonify(res))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
 
 
 # Give Offers
 
-@app.route('/nachhilfeboerse/api/addGiveOffer', methods=['POST'])
+@app.route("/nachhilfeboerse/api/addGiveOffer", methods=["POST"])
 def addGiveOffer():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     data = json.loads(request.data)
     dbSession = DB()
     
@@ -238,20 +238,20 @@ def addGiveOffer():
         )
         dbSession.add(newOffer)
         dbSession.commit()
-        resp = make_response(jsonify({'status': True}))
+        resp = make_response(jsonify({"status": True}))
         
     else:
-        resp = make_response(jsonify({'status': False}))
+        resp = make_response(jsonify({"status": False}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/getGiveOffers', methods=['GET'])
+@app.route("/nachhilfeboerse/api/getGiveOffers", methods=["GET"])
 def getGiveOffers():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isLoggedIn(dbSession, username, token):
@@ -271,42 +271,42 @@ def getGiveOffers():
             for giveLesson in giveLessonsData
         ]
 
-        resp = make_response(jsonify({'status': 'worked', "giveOffers": res}))
+        resp = make_response(jsonify({"status": "worked", "giveOffers": res}))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
 
 
-@app.route('/nachhilfeboerse/api/delGiveOffer', methods=['POST'])
+@app.route("/nachhilfeboerse/api/delGiveOffer", methods=["POST"])
 def delGiveOffer():
     data = json.loads(request.data)
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
         if dbSession.query(GiveLessons).join(Users).filter(GiveLessons.id == data.get("idNum")).filter(Users.username == username).first() is not None:
             dbSession.query(GiveLessons).filter(GiveLessons.id == data.get("idNum")).delete()
             dbSession.commit()
-            resp = make_response(jsonify({'status': True}))
+            resp = make_response(jsonify({"status": True}))
             
         else:
-            resp = make_response(jsonify({'status': False}))
+            resp = make_response(jsonify({"status": False}))
             
     else:
         resp = make_response(
             jsonify(
-                {'status': False}))
+                {"status": False}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
 # Take Offers
-@app.route('/nachhilfeboerse/api/addTakeOffer', methods=['POST'])
+@app.route("/nachhilfeboerse/api/addTakeOffer", methods=["POST"])
 def addTakeOffer():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     data = json.loads(request.data)
     dbSession = DB()
     
@@ -322,20 +322,20 @@ def addTakeOffer():
         
         dbSession.add(newOffer)
         dbSession.commit()
-        resp = make_response(jsonify({'status': True}))
+        resp = make_response(jsonify({"status": True}))
         
     else:
-        resp = make_response(jsonify({'status': False}))
+        resp = make_response(jsonify({"status": False}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/getTakeOffers', methods=['GET'])
+@app.route("/nachhilfeboerse/api/getTakeOffers", methods=["GET"])
 def getTakeOffers():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isLoggedIn(dbSession, username, token):
@@ -351,17 +351,17 @@ def getTakeOffers():
             for takeLesson in takeLessonsData
         ]
 
-        resp = make_response(jsonify({'status': 'worked', "takeOffers": res}))
+        resp = make_response(jsonify({"status": "worked", "takeOffers": res}))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     return resp
 
 
-@app.route('/nachhilfeboerse/api/delTakeOffer', methods=['POST'])
+@app.route("/nachhilfeboerse/api/delTakeOffer", methods=["POST"])
 def delTakeOffer():
     data = json.loads(request.data)
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isLoggedIn(dbSession, username, token):
@@ -369,24 +369,24 @@ def delTakeOffer():
             dbSession.query(TakeLessons).filter(
                 TakeLessons.id == data.get("idNum")).delete()
             dbSession.commit()
-            resp = make_response(jsonify({'status': True}))
+            resp = make_response(jsonify({"status": True}))
             
         else:
-            resp = make_response(jsonify({'status': False}))
+            resp = make_response(jsonify({"status": False}))
             
     else:
-        resp = make_response(jsonify({'status': False}))
+        resp = make_response(jsonify({"status": False}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
 # User management
-@app.route('/nachhilfeboerse/api/getStartPasswords', methods=['GET'])
+@app.route("/nachhilfeboerse/api/getStartPasswords", methods=["GET"])
 def getStartPasswords():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     jsonData = {}
     
@@ -403,16 +403,16 @@ def getStartPasswords():
     else:
         resp = make_response(jsonify({"status": "Permissionerror"}))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/importUsers', methods=['POST'])
+@app.route("/nachhilfeboerse/api/importUsers", methods=["POST"])
 def importUsers():
     data = json.loads(request.data)
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     
     if isAdminLogin(dbSession, username, token):
@@ -443,37 +443,37 @@ def importUsers():
                     notImported.append(user)
                     
             dbSession.commit()
-        resp = make_response(jsonify({'status': 'imported', "ignored": notImported}))
+        resp = make_response(jsonify({"status": "imported", "ignored": notImported}))
         
     else:
-        resp = make_response(jsonify({'status': 'Permissionerror'}))
+        resp = make_response(jsonify({"status": "Permissionerror"}))
         
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/isAdmin', methods=['GET'])
+@app.route("/nachhilfeboerse/api/isAdmin", methods=["GET"])
 def isAdmin():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
-    resp = make_response(jsonify({'isAdmin': False}))
+    resp = make_response(jsonify({"isAdmin": False}))
     
     if isAdminLogin(dbSession, username, token):
-        resp = make_response(jsonify({'isAdmin': True}))
+        resp = make_response(jsonify({"isAdmin": True}))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/getPersonalData', methods=['GET'])
+@app.route("/nachhilfeboerse/api/getPersonalData", methods=["GET"])
 def getPersonalData():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
-    resp = make_response(jsonify({'error': "Permission missing"}))
+    resp = make_response(jsonify({"error": "Permission missing"}))
     
     if isLoggedIn(dbSession, username, token):
 
@@ -481,45 +481,45 @@ def getPersonalData():
         
         if personalData is not None:
             resp = make_response(jsonify({
-                'name': personalData.name, 
+                "name": personalData.name, 
                 "email": personalData.email, 
                 "tel": personalData.phonenumber
             }))
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 
-@app.route('/nachhilfeboerse/api/changePersonalData', methods=['POST'])
+@app.route("/nachhilfeboerse/api/changePersonalData", methods=["POST"])
 def changePersonalData():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     data = json.loads(request.data)
-    resp = make_response(jsonify({'error': "Permission missing"}))
+    resp = make_response(jsonify({"error": "Permission missing"}))
     
     if isLoggedIn(dbSession, username, token):
         if data.get("toChange") == "Email":
             dbSession.query(Users).filter(Users.username == username).update({Users.email: data.get("email")})
-            resp = make_response(jsonify({'status': True, }))
+            resp = make_response(jsonify({"status": True, }))
             
         elif data.get("toChange") == "Tel":
             dbSession.query(Users).filter(Users.username == username).update({Users.phonenumber: data.get("tel")})
-            resp = make_response(jsonify({'status': True, }))
+            resp = make_response(jsonify({"status": True, }))
             
         else:
-            resp = make_response(jsonify({'error': "toChange needed", }))
+            resp = make_response(jsonify({"error": "toChange needed", }))
             
         dbSession.commit()
 
-    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers["Access-Control-Allow-Origin"] = "*"
     dbSession.close()
     return resp
 
 # # region match_old
 # # TODO: fix
-# @ app.route('/nachhilfeboerse/api/match')
+# @ app.route("/nachhilfeboerse/api/match")
 # def match():
 #     loginstate: LoginStates = getLoginState(request.cookies)
 #     if loginstate == LoginStates.ADMIN_LOGIN:
@@ -545,10 +545,10 @@ def changePersonalData():
 # TODO: fix
 
 
-@ app.route('/nachhilfeboerse/api/match')
+@ app.route("/nachhilfeboerse/api/match")
 def match():
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     if isAdminLogin(dbSession, username, token):
         graph = generateGraph()
@@ -566,10 +566,10 @@ def match():
         takeLessonsLength = dbSession.query(TakeLessons).count()
         dbSession.close()
         resp = make_response(jsonify({
-            'matchedAmount': matchCount, 
+            "matchedAmount": matchCount, 
             "totalAmount": takeLessonsLength
         }))
-        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers["Access-Control-Allow-Origin"] = "*"
         return resp
     else:
         abort(403)
@@ -600,11 +600,11 @@ def match():
 #     return "Der Link ist nicht mehr aktuell, bitte fordere einen neuen an!"
 
 
-@app.route("/nachhilfeboerse/api/einstellungen/email", methods=['POST'])
+@app.route("/nachhilfeboerse/api/einstellungen/email", methods=["POST"])
 def changeEmail():
     data = json.loads(request.data)
-    username = request.args.get('username')
-    token = request.args.get('token')
+    username = request.args.get("username")
+    token = request.args.get("token")
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
         dbSession.query(Users).filter(Users.username == username).update({Users.email: data.get("email")})
@@ -614,5 +614,5 @@ def changeEmail():
         abort(403)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
