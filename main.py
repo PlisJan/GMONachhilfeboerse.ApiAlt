@@ -137,7 +137,7 @@ def changePassword():
         if(loginData is not None):
             if(hash_pw(username, data.get("oldPassword")) == loginData.password):
                 dbSession.query(Users).filter(
-                    Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()})
+                    Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
                 dbSession.commit()
                 resp = make_response(jsonify({'status': True, }))
             else:
