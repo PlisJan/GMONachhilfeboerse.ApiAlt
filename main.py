@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import json
-import random
 import secrets
 import uuid
 
@@ -14,6 +13,11 @@ from db_tables import *
 from helper.db_helper import *
 from helper.hopcroftkarp import HopcroftKarp
 from helper.mail import Operations, mail
+
+
+def hash_pw(username: str, password: str):
+    return hashlib.sha256(bytes(username.lower() + password, "utf-8")).hexdigest()
+
 
 app = Flask(__name__)
 
@@ -77,23 +81,22 @@ def login():
 
     loginData = dbSession.query(Users).filter(
         Users.username == requestData.get("username").lower()).first()
-    if(loginData != None):
-        if(hashlib.sha256((requestData.get("username").lower()+requestData.get("password")).encode("utf-8")).hexdigest() == loginData.password):
-            token = secrets.token_urlsafe(256)
-            dbSession.query(Users).filter(
-                Users.username == loginData.username).update({Users.token: token})
-            dbSession.commit()
-            resp = make_response(
-                jsonify(
-                    {'status': True,
-                     "user": requestData.get("username").lower(),
-                     "firstlogin": loginData.firstLogin,
-                     'token': token}))
-        else:
-            resp = make_response(jsonify({'status': False}))
-    else:
+    if loginData is None:
         resp = make_response(jsonify({'status': False}))
 
+    elif (hash_pw(requestData.get("username"), requestData.get("password")) == loginData.password):
+        token = secrets.token_urlsafe(256)
+        dbSession.query(Users).filter(
+            Users.username == loginData.username).update({Users.token: token})
+        dbSession.commit()
+        resp = make_response(
+            jsonify(
+                {'status': True,
+                 "user": requestData.get("username").lower(),
+                 "firstlogin": loginData.firstLogin,
+                 'token': token}))
+    else:
+        resp = make_response(jsonify({'status': False}))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -131,10 +134,10 @@ def changePassword():
 
         loginData = dbSession.query(Users).filter(
             Users.username == username.lower()).first()
-        if(loginData != None):
-            if(hashlib.sha256((username.lower()+data.get("oldPassword")).encode("utf-8")).hexdigest() == loginData.password):
+        if(loginData is not None):
+            if(hash_pw(username, data.get("oldPassword")) == loginData.password):
                 dbSession.query(Users).filter(
-                    Users.username == loginData.username).update({Users.password: hashlib.sha256((username.lower()+data.get("newPassword")).encode("utf-8")).hexdigest()})
+                    Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()})
                 dbSession.commit()
                 resp = make_response(jsonify({'status': True, }))
             else:
@@ -173,7 +176,7 @@ def addPeronalData():
 def isLoggedIn(dbSession, username, token):
     loginData = dbSession.query(Users).filter(
         Users.username == username.lower()).first()
-    if(loginData != None):
+    if(loginData is not None):
         return loginData.token == token
     return False
 
@@ -181,7 +184,7 @@ def isLoggedIn(dbSession, username, token):
 def isAdminLogin(dbSession, username, token):
     loginData = dbSession.query(Users).filter(
         Users.username == username.lower()).first()
-    if(loginData != None):
+    if(loginData is not None):
         return loginData.token == token and loginData.admin
     return False
 
@@ -238,7 +241,7 @@ def getGiveOffers():
         res = []
         for giveLesson in giveLessonsData:
             res.append({
-                "matched": giveLesson[7] != None,
+                "matched": giveLesson[7] is not None,
                 "subject": giveLesson[1],
                 "times": json.loads(giveLesson[2]),
                 "minClass": giveLesson[3],
@@ -263,7 +266,7 @@ def delGiveOffer():
     token = request.args.get('token')
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
-        if dbSession.query(GiveLessons).join(Users).filter(GiveLessons.id == data.get("idNum")).filter(Users.username == username).first() != None:
+        if dbSession.query(GiveLessons).join(Users).filter(GiveLessons.id == data.get("idNum")).filter(Users.username == username).first() is not None:
             dbSession.query(GiveLessons).filter(
                 GiveLessons.id == data.get("idNum")).delete()
             dbSession.commit()
@@ -321,7 +324,7 @@ def getTakeOffers():
         res = []
         for takeLesson in takeLessonsData:
             res.append({
-                "matched": takeLesson[5] != None,
+                "matched": takeLesson[5] is not None,
                 "subject": takeLesson[1],
                 "times": json.loads(takeLesson[2]),
                 "name": takeLesson[5],
@@ -344,7 +347,7 @@ def delTakeOffer():
     token = request.args.get('token')
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
-        if dbSession.query(TakeLessons).join(Users).filter(TakeLessons.id == data.get("idNum")).filter(Users.username == username).first() != None:
+        if dbSession.query(TakeLessons).join(Users).filter(TakeLessons.id == data.get("idNum")).filter(Users.username == username).first() is not None:
             dbSession.query(TakeLessons).filter(
                 TakeLessons.id == data.get("idNum")).delete()
             dbSession.commit()
@@ -416,8 +419,13 @@ def importUsers():
             for user in data[k]:
                 if user not in existingUsers:
                     startPassword = secrets.token_urlsafe(16)
-                    newUser = Users(username=user.lower(), startPassword=startPassword, password=hashlib.sha256(
-                        (user.lower()+startPassword).encode("utf-8")).hexdigest(), firstLogin=True, class_id=classId)
+                    newUser = Users(
+                        username=user.lower(), 
+                        startPassword=startPassword, 
+                        password=hash_pw(user, startPassword), 
+                        firstLogin=True, 
+                        class_id=classId
+                    )
                     dbSession.add(newUser)
                 else:
                     notImported.append(user)
@@ -464,7 +472,7 @@ def getPersonalData():
 
         personalData: Users = dbSession.query(Users).filter(
             Users.username == username.lower()).first()
-        if(personalData != None):
+        if(personalData is not None):
             resp = make_response(
                 jsonify(
                     {'name': personalData.name, "email": personalData.email, "tel": personalData.phonenumber}))
