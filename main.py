@@ -1,16 +1,18 @@
-from flask import Flask, request, jsonify, make_response, abort
-from sqlalchemy.sql.functions import user
-from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
 import datetime
 import hashlib
 import json
-import secrets
 import random
+import secrets
+import uuid
+
+from flask import Flask, abort, jsonify, make_response, request
+from sqlalchemy.sql.functions import user
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from database import Session as DB
 from db_tables import *
-from helper.hopcroftkarp import HopcroftKarp
 from helper.db_helper import *
+from helper.hopcroftkarp import HopcroftKarp
 from helper.mail import Operations, mail
 
 app = Flask(__name__)
@@ -70,13 +72,13 @@ ORDER BY TakeLessons.id ASC
 
 @app.route('/nachhilfeboerse/api/login', methods=['POST'])
 def login():
-    data = json.loads(request.data)
+    requestData = json.loads(request.data)
     dbSession = DB()
 
     loginData = dbSession.query(Users).filter(
-        Users.username == data.get("username").lower()).first()
+        Users.username == requestData.get("username").lower()).first()
     if(loginData != None):
-        if(hashlib.sha256(data.get("password").encode("utf-8")).hexdigest() == loginData.password):
+        if(hashlib.sha256((requestData.get("username").lower()+requestData.get("password")).encode("utf-8")).hexdigest() == loginData.password):
             token = secrets.token_urlsafe(256)
             dbSession.query(Users).filter(
                 Users.username == loginData.username).update({Users.token: token})
@@ -84,7 +86,7 @@ def login():
             resp = make_response(
                 jsonify(
                     {'status': True,
-                     "user": data.get("username").lower(),
+                     "user": requestData.get("username").lower(),
                      "firstlogin": loginData.firstLogin,
                      'token': token}))
         else:
@@ -130,9 +132,9 @@ def changePassword():
         loginData = dbSession.query(Users).filter(
             Users.username == username.lower()).first()
         if(loginData != None):
-            if(hashlib.sha256(data.get("oldPassword").encode("utf-8")).hexdigest() == loginData.password):
+            if(hashlib.sha256((username.lower()+data.get("oldPassword")).encode("utf-8")).hexdigest() == loginData.password):
                 dbSession.query(Users).filter(
-                    Users.username == loginData.username).update({Users.password: hashlib.sha256(data.get("newPassword").encode("utf-8")).hexdigest()})
+                    Users.username == loginData.username).update({Users.password: hashlib.sha256((username.lower()+data.get("newPassword")).encode("utf-8")).hexdigest()})
                 dbSession.commit()
                 resp = make_response(jsonify({'status': True, }))
             else:
@@ -415,7 +417,7 @@ def importUsers():
                 if user not in existingUsers:
                     startPassword = secrets.token_urlsafe(16)
                     newUser = Users(username=user.lower(), startPassword=startPassword, password=hashlib.sha256(
-                        startPassword.encode("utf-8")).hexdigest(), firstLogin=True, class_id=classId)
+                        (user.lower()+startPassword).encode("utf-8")).hexdigest(), firstLogin=True, class_id=classId)
                     dbSession.add(newUser)
                 else:
                     notImported.append(user)
