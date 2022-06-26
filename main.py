@@ -203,7 +203,16 @@ def getSubjects():
     return resp
 
 
+@app.route('/nachhilfeboerse/api/testFlask', methods=['GET'])
+def testFlask():
+
+    resp = make_response(jsonify({"status": "working"}))
+
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
 # Give Offers
+
 
 @app.route('/nachhilfeboerse/api/addGiveOffer', methods=['POST'])
 def addGiveOffer():
@@ -420,10 +429,10 @@ def importUsers():
                 if user not in existingUsers:
                     startPassword = secrets.token_urlsafe(16)
                     newUser = Users(
-                        username=user.lower(), 
-                        startPassword=startPassword, 
-                        password=hash_pw(user, startPassword), 
-                        firstLogin=True, 
+                        username=user.lower(),
+                        startPassword=startPassword,
+                        password=hash_pw(user, startPassword),
+                        firstLogin=True,
                         class_id=classId
                     )
                     dbSession.add(newUser)
