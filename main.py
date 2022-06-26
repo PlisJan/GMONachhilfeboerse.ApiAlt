@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import json
-import random
 import secrets
 import uuid
 
@@ -14,6 +13,11 @@ from db_tables import *
 from helper.db_helper import *
 from helper.hopcroftkarp import HopcroftKarp
 from helper.mail import Operations, mail
+
+
+def hash_pw(username: str, password: str):
+    return hashlib.sha256(bytes(username.lower() + password, "utf-8")).hexdigest()
+
 
 app = Flask(__name__)
 
@@ -77,23 +81,22 @@ def login():
 
     loginData = dbSession.query(Users).filter(
         Users.username == requestData.get("username").lower()).first()
-    if loginData is not None:
-        if(hashlib.sha256((requestData.get("username").lower()+requestData.get("password")).encode("utf-8")).hexdigest() == loginData.password):
-            token = secrets.token_urlsafe(256)
-            dbSession.query(Users).filter(
-                Users.username == loginData.username).update({Users.token: token})
-            dbSession.commit()
-            resp = make_response(
-                jsonify(
-                    {'status': True,
-                     "user": requestData.get("username").lower(),
-                     "firstlogin": loginData.firstLogin,
-                     'token': token}))
-        else:
-            resp = make_response(jsonify({'status': False}))
-    else:
+    if loginData is None:
         resp = make_response(jsonify({'status': False}))
 
+    elif (hash_pw(requestData.get("username"), requestData.get("password")) == loginData.password):
+        token = secrets.token_urlsafe(256)
+        dbSession.query(Users).filter(
+            Users.username == loginData.username).update({Users.token: token})
+        dbSession.commit()
+        resp = make_response(
+            jsonify(
+                {'status': True,
+                 "user": requestData.get("username").lower(),
+                 "firstlogin": loginData.firstLogin,
+                 'token': token}))
+    else:
+        resp = make_response(jsonify({'status': False}))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -132,9 +135,9 @@ def changePassword():
         loginData = dbSession.query(Users).filter(
             Users.username == username.lower()).first()
         if(loginData is not None):
-            if(hashlib.sha256((username.lower()+data.get("oldPassword")).encode("utf-8")).hexdigest() == loginData.password):
+            if(hash_pw(username, data.get("oldPassword")) == loginData.password):
                 dbSession.query(Users).filter(
-                    Users.username == loginData.username).update({Users.password: hashlib.sha256((username.lower()+data.get("newPassword")).encode("utf-8")).hexdigest()})
+                    Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()})
                 dbSession.commit()
                 resp = make_response(jsonify({'status': True, }))
             else:
@@ -416,8 +419,13 @@ def importUsers():
             for user in data[k]:
                 if user not in existingUsers:
                     startPassword = secrets.token_urlsafe(16)
-                    newUser = Users(username=user.lower(), startPassword=startPassword, password=hashlib.sha256(
-                        (user.lower()+startPassword).encode("utf-8")).hexdigest(), firstLogin=True, class_id=classId)
+                    newUser = Users(
+                        username=user.lower(), 
+                        startPassword=startPassword, 
+                        password=hash_pw(user, startPassword), 
+                        firstLogin=True, 
+                        class_id=classId
+                    )
                     dbSession.add(newUser)
                 else:
                     notImported.append(user)
