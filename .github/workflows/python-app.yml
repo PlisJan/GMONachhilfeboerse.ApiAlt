@@ -37,8 +37,5 @@ jobs:
     - name: Start gunicorn
       run: gunicorn --workers 3 --bind 0.0.0.0:5000 -m 007 --daemon main:app
     - name: Curl to api/getSubjects
-      run: curl -XGET 'http://google.com'
-    
-    - name: Test with pytest
-      run: |
-        pytest
+      run: curl -XGET 'http://localhost:5000/nachhilfeboerse/api'
+  
