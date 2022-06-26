@@ -215,6 +215,14 @@ def getSubjects():
     return resp
 
 
+@app.route('/nachhilfeboerse/api/testFlask', methods=['GET'])
+def testFlask():
+
+    resp = make_response(jsonify({"status": "working"}))
+
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
 # Give Offers
 
 @app.route("/nachhilfeboerse/api/addGiveOffer", methods=["POST"])
