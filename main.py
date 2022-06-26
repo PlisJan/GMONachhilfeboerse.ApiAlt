@@ -610,7 +610,6 @@ def changeEmail():
         dbSession.query(Users).filter(Users.username == username).update({Users.email: data.get("email")})
         dbSession.commit()
         dbSession.close()
-        dbSession.close()
     else:
         abort(403)
 
