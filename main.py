@@ -80,7 +80,9 @@ def login():
     dbSession = DB()
 
     loginData = dbSession.query(Users).filter(
-        Users.username == requestData.get("username").lower()).first()
+        Users.username == requestData.get("username").lower()
+    ).first()
+    
     if loginData is None:
         resp = make_response(jsonify({'status': False}))
 
@@ -90,13 +92,17 @@ def login():
             Users.username == loginData.username).update({Users.token: token})
         dbSession.commit()
         resp = make_response(
-            jsonify(
-                {'status': True,
-                 "user": requestData.get("username").lower(),
-                 "firstlogin": loginData.firstLogin,
-                 'token': token}))
+            jsonify({
+                "status": True,
+                "user": requestData.get("username").lower(),
+                "firstlogin": loginData.firstLogin,
+                "token": token
+            })
+        )
+        
     else:
         resp = make_response(jsonify({'status': False}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -107,17 +113,20 @@ def logout():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
         dbSession.query(Users).filter(
-            Users.username == username).update({Users.token: None})
+            Users.username == username
+        ).update({Users.token: None})
         dbSession.commit()
-        resp = make_response(
-            jsonify(
-                {"status": "Logged Out"}))
+        resp = make_response(jsonify({"status": "Logged Out"}))
+        
     else:
         resp = make_response(
             jsonify(
-                {"status": "Permissionerror"}))
+                {"status": "Permissionerror"}
+            )
+        )
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
@@ -130,20 +139,25 @@ def changePassword():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
-
         loginData = dbSession.query(Users).filter(
-            Users.username == username.lower()).first()
+            Users.username == username.lower()
+        ).first()
+        
         if loginData is None:
             resp = make_response(jsonify({'status': False}))
 
         elif (hash_pw(username, data.get("oldPassword")) == loginData.password):
             dbSession.query(Users).filter(
-                Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
+                Users.username == loginData.username
+            ).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
             dbSession.commit()
-            resp = make_response(jsonify({'status': True, }))
+            resp = make_response(jsonify({'status': True}))
+            
         else:
             resp = make_response(jsonify({'status': False}))
+            
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -155,17 +169,17 @@ def addPeronalData():
     token = request.args.get('token')
     data = json.loads(request.data)
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
         dbSession.query(Users).filter(
-            Users.username == username).update({Users.name: data.get("name"), Users.email: data.get("email"), Users.phonenumber: data.get("phonenumber"), Users.firstLogin: False})
+            Users.username == username
+        ).update({Users.name: data.get("name"), Users.email: data.get("email"), Users.phonenumber: data.get("phonenumber"), Users.firstLogin: False})
+        
         dbSession.commit()
-        resp = make_response(
-            jsonify(
-                {"status": True}))
+        resp = make_response(jsonify({"status": True}))
+        
     else:
-        resp = make_response(
-            jsonify(
-                {"status": False}))
+        resp = make_response(jsonify({"status": False}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
@@ -192,7 +206,8 @@ def isAdminLogin(dbSession, username, token):
 def getSubjects():
 
     dbSession = DB()
-    res = {subject.shortcut: subject.long_name for subject in dbSession.query(Subjects).all()}
+    res = {subject.shortcut: subject.long_name for subject in dbSession.query(
+        Subjects).all()}
 
     resp = make_response(jsonify(res))
 
@@ -208,20 +223,26 @@ def addGiveOffer():
     token = request.args.get('token')
     data = json.loads(request.data)
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
         userID = dbSession.query(Users.user_id).filter(
             Users.username == username).first()[0]
-        newOffer = GiveLessons(user_id=userID, subject=data.get("subject"), times=data.get("times"), allowTel=data.get(
-            "allowTel"), allowEmail=data.get("allowEmail"), min_class=data.get("minClass"), max_class=data.get("maxClass"))
+        newOffer = GiveLessons(
+            user_id=userID, 
+            subject=data.get("subject"),
+            times=data.get("times"), 
+            allowTel=data.get("allowTel"), 
+            allowEmail=data.get("allowEmail"), 
+            min_class=data.get("minClass"), 
+            max_class=data.get("maxClass")
+        )
         dbSession.add(newOffer)
         dbSession.commit()
-        resp = make_response(
-            jsonify(
-                {'status': True}))
+        resp = make_response(jsonify({'status': True}))
+        
     else:
-        resp = make_response(
-            jsonify(
-                {'status': False}))
+        resp = make_response(jsonify({'status': False}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -232,27 +253,25 @@ def getGiveOffers():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
-        giveLessonsData = dbSession.execute(
-            getGiveOffersSql.format(username.lower())).fetchall()
+        giveLessonsData = dbSession.execute(getGiveOffersSql.format(username.lower())).fetchall()
         res = [
             {
-                "matched": giveLesson[7] is not None, 
+                "matched": giveLesson[7] is not None,
                 "subject": giveLesson[1],
                 "times": json.loads(giveLesson[2]),
                 "minClass": giveLesson[3],
-                "maxClass": giveLesson[4], 
-                "name": giveLesson[7], 
-                "email": giveLesson[8] if giveLesson[5] == 1 else "", 
+                "maxClass": giveLesson[4],
+                "name": giveLesson[7],
+                "email": giveLesson[8] if giveLesson[5] == 1 else "",
                 "tel": giveLesson[9] if giveLesson[6] == 1 else "",
                 "idNum": giveLesson[0]
-            } 
+            }
             for giveLesson in giveLessonsData
         ]
 
-        resp = make_response(
-            jsonify(
-                {'status': 'worked', "giveOffers":     res}))
+        resp = make_response(jsonify({'status': 'worked', "giveOffers": res}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
@@ -266,47 +285,48 @@ def delGiveOffer():
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
         if dbSession.query(GiveLessons).join(Users).filter(GiveLessons.id == data.get("idNum")).filter(Users.username == username).first() is not None:
-            dbSession.query(GiveLessons).filter(
-                GiveLessons.id == data.get("idNum")).delete()
+            dbSession.query(GiveLessons).filter(GiveLessons.id == data.get("idNum")).delete()
             dbSession.commit()
-            resp = make_response(
-                jsonify(
-                    {'status': True}))
+            resp = make_response(jsonify({'status': True}))
+            
         else:
-            resp = make_response(
-                jsonify(
-                    {'status': False}))
+            resp = make_response(jsonify({'status': False}))
+            
     else:
         resp = make_response(
             jsonify(
                 {'status': False}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
 
 
 # Take Offers
-
 @app.route('/nachhilfeboerse/api/addTakeOffer', methods=['POST'])
 def addTakeOffer():
     username = request.args.get('username')
     token = request.args.get('token')
     data = json.loads(request.data)
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
-        userID = dbSession.query(Users.user_id).filter(
-            Users.username == username).first()[0]
-        newOffer = TakeLessons(user_id=userID, subject=data.get("subject"), times=data.get("times"), allowTel=data.get(
-            "allowTel"), allowEmail=data.get("allowEmail"))
+        userID = dbSession.query(Users.user_id).filter(Users.username == username).first()[0]
+        newOffer = TakeLessons(
+            user_id=userID,
+            subject=data.get("subject"), 
+            times=data.get("times"), 
+            allowTel=data.get("allowTel"),
+            allowEmail=data.get("allowEmail")
+        )
+        
         dbSession.add(newOffer)
         dbSession.commit()
-        resp = make_response(
-            jsonify(
-                {'status': True}))
+        resp = make_response(jsonify({'status': True}))
+        
     else:
-        resp = make_response(
-            jsonify(
-                {'status': False}))
+        resp = make_response(jsonify({'status': False}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -317,23 +337,21 @@ def getTakeOffers():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
-        takeLessonsData = dbSession.execute(
-            getTakeOffersSql.format(username.lower())).fetchall()
+        takeLessonsData = dbSession.execute(getTakeOffersSql.format(username.lower())).fetchall()
         res = [
             {
-                "matched": takeLesson[5] is not None, 
-                "subject": takeLesson[1], "times": json.loads(takeLesson[2]), 
-                "name": takeLesson[5], "email": takeLesson[6] if takeLesson[3] == 1 else "", 
-                "tel": takeLesson[7] if takeLesson[4] == 1 else "", 
+                "matched": takeLesson[5] is not None,
+                "subject": takeLesson[1], "times": json.loads(takeLesson[2]),
+                "name": takeLesson[5], "email": takeLesson[6] if takeLesson[3] == 1 else "",
+                "tel": takeLesson[7] if takeLesson[4] == 1 else "",
                 "idNum": takeLesson[0]
-            } 
+            }
             for takeLesson in takeLessonsData
         ]
 
-        resp = make_response(
-            jsonify(
-                {'status': 'worked', "takeOffers": res}))
+        resp = make_response(jsonify({'status': 'worked', "takeOffers": res}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
@@ -345,53 +363,45 @@ def delTakeOffer():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isLoggedIn(dbSession, username, token):
         if dbSession.query(TakeLessons).join(Users).filter(TakeLessons.id == data.get("idNum")).filter(Users.username == username).first() is not None:
             dbSession.query(TakeLessons).filter(
                 TakeLessons.id == data.get("idNum")).delete()
             dbSession.commit()
-            resp = make_response(
-                jsonify(
-                    {'status': True}))
+            resp = make_response(jsonify({'status': True}))
+            
         else:
-            resp = make_response(
-                jsonify(
-                    {'status': False}))
+            resp = make_response(jsonify({'status': False}))
+            
     else:
-        resp = make_response(
-            jsonify(
-                {'status': False}))
+        resp = make_response(jsonify({'status': False}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
 
+
 # User management
-
-
 @app.route('/nachhilfeboerse/api/getStartPasswords', methods=['GET'])
 def getStartPasswords():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
     jsonData = {}
+    
     if isAdminLogin(dbSession, username, token):
-        startPasswordData = dbSession.query(
-            Classes.name, Users.username, Users.startPassword).join(Classes).all()
+        startPasswordData = dbSession.query(Classes.name, Users.username, Users.startPassword).join(Classes).all()
         for startPasswordUser in startPasswordData:
             if startPasswordUser[0] in jsonData:
-                jsonData[startPasswordUser[0]].append(
-                    {"username": startPasswordUser[1], "startPassword": startPasswordUser[2]})
+                jsonData[startPasswordUser[0]].append({"username": startPasswordUser[1], "startPassword": startPasswordUser[2]})
             else:
-                jsonData[startPasswordUser[0]] = [{
-                    "username": startPasswordUser[1], "startPassword": startPasswordUser[2]}]
+                jsonData[startPasswordUser[0]] = [{"username": startPasswordUser[1], "startPassword": startPasswordUser[2]}]
 
-        resp = make_response(
-            jsonify(
-                jsonData))
+        resp = make_response(jsonify(jsonData))
+        
     else:
-        resp = make_response(
-            jsonify(
-                {"status": "Permissionerror"}))
+        resp = make_response(jsonify({"status": "Permissionerror"}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
@@ -404,38 +414,40 @@ def importUsers():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
+    
     if isAdminLogin(dbSession, username, token):
         notImported = []
         existingClasses = [v[0] for v in dbSession.query(Classes.name).all()]
         existingUsers = [v[0] for v in dbSession.query(Users.username).all()]
+        
         for k in data.keys():
-            if(k not in existingClasses):
+            if k not in existingClasses:
                 newClass = Classes(name=k.lower())
                 dbSession.add(newClass)
                 dbSession.commit()
-            classId = dbSession.query(Classes.id).filter(
-                Classes.name == k).first()[0]
+                
+            classId = dbSession.query(Classes.id).filter(Classes.name == k).first()[0]
+            
             for user in data[k]:
                 if user not in existingUsers:
                     startPassword = secrets.token_urlsafe(16)
                     newUser = Users(
-                        username=user.lower(), 
-                        startPassword=startPassword, 
-                        password=hash_pw(user, startPassword), 
-                        firstLogin=True, 
+                        username=user.lower(),
+                        startPassword=startPassword,
+                        password=hash_pw(user, startPassword),
+                        firstLogin=True,
                         class_id=classId
                     )
                     dbSession.add(newUser)
                 else:
                     notImported.append(user)
+                    
             dbSession.commit()
-        resp = make_response(
-            jsonify(
-                {'status': 'imported', "ignored": notImported}))
+        resp = make_response(jsonify({'status': 'imported', "ignored": notImported}))
+        
     else:
-        resp = make_response(
-            jsonify(
-                {'status': 'Permissionerror'}))
+        resp = make_response(jsonify({'status': 'Permissionerror'}))
+        
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -446,13 +458,10 @@ def isAdmin():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
-    resp = make_response(
-        jsonify(
-            {'isAdmin': False}))
+    resp = make_response(jsonify({'isAdmin': False}))
+    
     if isAdminLogin(dbSession, username, token):
-        resp = make_response(
-            jsonify(
-                {'isAdmin': True}))
+        resp = make_response(jsonify({'isAdmin': True}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
@@ -464,17 +473,18 @@ def getPersonalData():
     username = request.args.get('username')
     token = request.args.get('token')
     dbSession = DB()
-    resp = make_response(
-        jsonify(
-            {'error': "Permission missing"}))
+    resp = make_response(jsonify({'error': "Permission missing"}))
+    
     if isLoggedIn(dbSession, username, token):
 
-        personalData: Users = dbSession.query(Users).filter(
-            Users.username == username.lower()).first()
-        if(personalData is not None):
-            resp = make_response(
-                jsonify(
-                    {'name': personalData.name, "email": personalData.email, "tel": personalData.phonenumber}))
+        personalData: Users = dbSession.query(Users).filter(Users.username == username.lower()).first()
+        
+        if personalData is not None:
+            resp = make_response(jsonify({
+                'name': personalData.name, 
+                "email": personalData.email, 
+                "tel": personalData.phonenumber
+            }))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
@@ -487,20 +497,20 @@ def changePersonalData():
     token = request.args.get('token')
     dbSession = DB()
     data = json.loads(request.data)
-    resp = make_response(
-        jsonify(
-            {'error': "Permission missing"}))
+    resp = make_response(jsonify({'error': "Permission missing"}))
+    
     if isLoggedIn(dbSession, username, token):
         if data.get("toChange") == "Email":
-            dbSession.query(Users).filter(
-                Users.username == username).update({Users.email: data.get("email")})
+            dbSession.query(Users).filter(Users.username == username).update({Users.email: data.get("email")})
             resp = make_response(jsonify({'status': True, }))
+            
         elif data.get("toChange") == "Tel":
-            dbSession.query(Users).filter(
-                Users.username == username).update({Users.phonenumber: data.get("tel")})
+            dbSession.query(Users).filter(Users.username == username).update({Users.phonenumber: data.get("tel")})
             resp = make_response(jsonify({'status': True, }))
+            
         else:
             resp = make_response(jsonify({'error': "toChange needed", }))
+            
         dbSession.commit()
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
@@ -544,19 +554,21 @@ def match():
         graph = generateGraph()
         dbSession = DB()
         matchCount = 0
-        matching: dict = dict(
-            sorted(HopcroftKarp(graph).maximum_matching(keys_only=True).items()))
+        matching: dict = dict(sorted(HopcroftKarp(graph).maximum_matching(keys_only=True).items()))
         dbSession.query(Matches).delete()
+        
         for key, value in matching.items():
             match = Matches(giveLessons_id=int(key), takeLessons_id=value)
             dbSession.add(match)
             matchCount += 1
+            
         dbSession.commit()
         takeLessonsLength = dbSession.query(TakeLessons).count()
         dbSession.close()
-        resp = make_response(
-            jsonify(
-                {'matchedAmount': matchCount, "totalAmount": takeLessonsLength}))
+        resp = make_response(jsonify({
+            'matchedAmount': matchCount, 
+            "totalAmount": takeLessonsLength
+        }))
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
     else:
@@ -595,8 +607,7 @@ def changeEmail():
     token = request.args.get('token')
     dbSession = DB()
     if isLoggedIn(dbSession, username, token):
-        dbSession.query(Users).filter(Users.username == username).update(
-            {Users.email: data.get("email")})
+        dbSession.query(Users).filter(Users.username == username).update({Users.email: data.get("email")})
         dbSession.commit()
         dbSession.close()
         dbSession.close()
