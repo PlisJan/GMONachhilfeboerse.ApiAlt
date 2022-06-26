@@ -134,17 +134,16 @@ def changePassword():
 
         loginData = dbSession.query(Users).filter(
             Users.username == username.lower()).first()
-        if(loginData is not None):
-            if(hash_pw(username, data.get("oldPassword")) == loginData.password):
-                dbSession.query(Users).filter(
-                    Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
-                dbSession.commit()
-                resp = make_response(jsonify({'status': True, }))
-            else:
-                resp = make_response(jsonify({'status': False}))
-        else:
+        if loginData is None:
             resp = make_response(jsonify({'status': False}))
 
+        elif (hash_pw(username, data.get("oldPassword")) == loginData.password):
+            dbSession.query(Users).filter(
+                Users.username == loginData.username).update({Users.password: hash_pw(username, data.get("newPassword"))}).hexdigest()
+            dbSession.commit()
+            resp = make_response(jsonify({'status': True, }))
+        else:
+            resp = make_response(jsonify({'status': False}))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     dbSession.close()
     return resp
@@ -193,9 +192,7 @@ def isAdminLogin(dbSession, username, token):
 def getSubjects():
 
     dbSession = DB()
-    res = {}
-    for subject in dbSession.query(Subjects).all():
-        res.update({subject.shortcut: subject.long_name})
+    res = {subject.shortcut: subject.long_name for subject in dbSession.query(Subjects).all()}
 
     resp = make_response(jsonify(res))
 
@@ -238,19 +235,21 @@ def getGiveOffers():
     if isLoggedIn(dbSession, username, token):
         giveLessonsData = dbSession.execute(
             getGiveOffersSql.format(username.lower())).fetchall()
-        res = []
-        for giveLesson in giveLessonsData:
-            res.append({
-                "matched": giveLesson[7] is not None,
+        res = [
+            {
+                "matched": giveLesson[7] is not None, 
                 "subject": giveLesson[1],
                 "times": json.loads(giveLesson[2]),
                 "minClass": giveLesson[3],
-                "maxClass": giveLesson[4],
-                "name": giveLesson[7],
-                "email": giveLesson[8] if giveLesson[5] == 1 else "",
+                "maxClass": giveLesson[4], 
+                "name": giveLesson[7], 
+                "email": giveLesson[8] if giveLesson[5] == 1 else "", 
                 "tel": giveLesson[9] if giveLesson[6] == 1 else "",
                 "idNum": giveLesson[0]
-            })
+            } 
+            for giveLesson in giveLessonsData
+        ]
+
         resp = make_response(
             jsonify(
                 {'status': 'worked', "giveOffers":     res}))
@@ -321,20 +320,20 @@ def getTakeOffers():
     if isLoggedIn(dbSession, username, token):
         takeLessonsData = dbSession.execute(
             getTakeOffersSql.format(username.lower())).fetchall()
-        res = []
-        for takeLesson in takeLessonsData:
-            res.append({
-                "matched": takeLesson[5] is not None,
-                "subject": takeLesson[1],
-                "times": json.loads(takeLesson[2]),
-                "name": takeLesson[5],
-                "email": takeLesson[6] if takeLesson[3] == 1 else "",
-                "tel": takeLesson[7] if takeLesson[4] == 1 else "",
+        res = [
+            {
+                "matched": takeLesson[5] is not None, 
+                "subject": takeLesson[1], "times": json.loads(takeLesson[2]), 
+                "name": takeLesson[5], "email": takeLesson[6] if takeLesson[3] == 1 else "", 
+                "tel": takeLesson[7] if takeLesson[4] == 1 else "", 
                 "idNum": takeLesson[0]
-            })
+            } 
+            for takeLesson in takeLessonsData
+        ]
+
         resp = make_response(
             jsonify(
-                {'status': 'worked', "takeOffers":     res}))
+                {'status': 'worked', "takeOffers": res}))
 
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
@@ -379,7 +378,7 @@ def getStartPasswords():
         startPasswordData = dbSession.query(
             Classes.name, Users.username, Users.startPassword).join(Classes).all()
         for startPasswordUser in startPasswordData:
-            if startPasswordUser[0] in jsonData.keys():
+            if startPasswordUser[0] in jsonData:
                 jsonData[startPasswordUser[0]].append(
                     {"username": startPasswordUser[1], "startPassword": startPasswordUser[2]})
             else:
