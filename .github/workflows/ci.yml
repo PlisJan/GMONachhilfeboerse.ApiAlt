@@ -9,7 +9,7 @@ on:
     push:
         paths-ignore:
           - 'README.md'
-          - 'documentation/**'
+          - 'docs/**'
         branches: [main]
         # Publish semver tags as releases.
         tags: ["v*.*.*"]
@@ -63,7 +63,7 @@ jobs:
               uses: actions/checkout@v3
 
             - name: Remove doc folder
-              run: rm -rf documentation
+              run: rm -rf docs
 
             # Install the cosign tool except on PR
             # https://github.com/sigstore/cosign-installer
