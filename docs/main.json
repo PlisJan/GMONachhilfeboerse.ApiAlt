@@ -1,0 +1,159 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "GMO Nachhilfebörse",
+        "version": "v1.0"
+    },
+    "tags": [
+        {
+            "name": "Authentication"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "token": {
+                "type": "string",
+                "example": "ZQBvLBbEd0oKg0oPIQ8h9XvfNDzfuIhpY6exbLPplEynEMXUMjyUCyo8sNnf-a-BcjzTcfKEAWTHZCnFZgINEMjvdkBk0AQuree2vJSqNb7PB-NtpuOPj15ouMGSTyEZ3JqPLlm3rC3kYYMav55AlhsHYVZJz89Cy-n7hvP7lsqoLH-6PnfliY7j6O7mOENEzHKfZ04ySkarEEPH0A8q15wmjRY3oGA6uMXEyrOfS_k0YWtEZwOyi91QSdfTjFiuxx8RYrRIBNeYOv43QmMYg3VEK2VW2DGm9gJ4aOzxfFPKp7TM8xkGb-a0_Xc3r1yeCmUWyv8KDejo6mmAbHlecg",
+                "maxLength": 256,
+                "minLength": 256
+            }
+        }
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "description": "Endpoint to use to authenticate with the api",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "example": "doejohn00"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "MySecretPassword"
+                                    }
+                                }
+                            },
+                            "examples": {}
+                        }
+                    },
+                    "description": ""
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "user": {
+                                            "type": "string",
+                                            "example": "doejohn00"
+                                        },
+                                        "firstlogin": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "token": {
+                                            "$ref": "#/components/schemas/token"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Login Failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "default": "false"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "description": "Log out",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "description": "The username of the account that is to be logged out",
+                        "schema": {
+                            "type": "string",
+                            "example": "doejohn00"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "name": "token",
+                        "description": "The token of the account that is to be logged out",
+                        "schema": {
+                            "$ref": "#/components/schemas/token"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succesfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "default": "Logged Out"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "default": "Unauthorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
