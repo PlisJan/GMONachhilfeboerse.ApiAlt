@@ -264,8 +264,9 @@ def getGiveOffers():
     
     if isLoggedIn(dbSession, username, token):
         giveLessonsData = dbSession.execute(getGiveOffersSql.format(username.lower())).fetchall()
-        res = [
-            {
+        res = []
+        for giveLesson in giveLessonsData:
+            res.append({
                 "matched": giveLesson[7] is not None,
                 "subject": giveLesson[1],
                 "times": json.loads(giveLesson[2]),
@@ -275,9 +276,8 @@ def getGiveOffers():
                 "email": giveLesson[8] if giveLesson[5] == 1 else "",
                 "tel": giveLesson[9] if giveLesson[6] == 1 else "",
                 "idNum": giveLesson[0]
-            }
-            for giveLesson in giveLessonsData
-        ]
+            })
+        
 
         resp = make_response(jsonify({"status": "worked", "giveOffers": res}))
 
@@ -348,16 +348,15 @@ def getTakeOffers():
     
     if isLoggedIn(dbSession, username, token):
         takeLessonsData = dbSession.execute(getTakeOffersSql.format(username.lower())).fetchall()
-        res = [
-            {
+        res = []
+        for takeLesson in takeLessonsData:
+            res.append({
                 "matched": takeLesson[5] is not None,
                 "subject": takeLesson[1], "times": json.loads(takeLesson[2]),
                 "name": takeLesson[5], "email": takeLesson[6] if takeLesson[3] == 1 else "",
                 "tel": takeLesson[7] if takeLesson[4] == 1 else "",
                 "idNum": takeLesson[0]
-            }
-            for takeLesson in takeLessonsData
-        ]
+            })
 
         resp = make_response(jsonify({"status": "worked", "takeOffers": res}))
 
