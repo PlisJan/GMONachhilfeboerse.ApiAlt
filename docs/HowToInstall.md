@@ -1,5 +1,5 @@
 # How to install
-Thanks to @peter-evans  
+Thanks to [@peter-evans](https://github.com/peter-evans)
 
 
 
