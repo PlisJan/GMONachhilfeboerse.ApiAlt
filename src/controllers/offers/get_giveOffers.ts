@@ -67,7 +67,7 @@ export default async (req: Request, res: Response) => {
                 maxClass: row.max_class, // Just use the queued maxClass => no processing
                 name: row.name, // Just use the queued name of the oppenent => no processing
                 email: row.allowEmail ? row.email || null : null, // Only provide the opponents email if the opponent agreed and has an email specified, else return null
-                tel: row.allowTel ? row.tel || null : null, // Only provide the opponents tel if the opponent agreed and has an tel specified, else return null
+                phonenumber: row.allowTel ? row.tel || null : null, // Only provide the opponents tel if the opponent agreed and has an tel specified, else return null
             });
         } catch (error) {
             // Internal server error occured

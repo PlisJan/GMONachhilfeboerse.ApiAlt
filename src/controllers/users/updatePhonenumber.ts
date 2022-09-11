@@ -8,9 +8,7 @@ export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({
         phonenumber: Joi.string().alphanum().required(), // phonenumber, optional
-        user: Joi.object({
-            username: validationPatterns.username.required(),
-        }).unknown(true), // required username (for pattern see validation/commonPatterns)
+        user: validationPatterns.user, // required user (for pattern see validation/commonPatterns)
     });
 
     // Validate the request body

@@ -12,4 +12,16 @@ const password = Joi.string()
     // 1 special character    (?=.*[\W])
     .pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).*)/);
 
-export default { username, password };
+const times = Joi.object({
+    Mo: Joi.string().allow("").required(),
+    Di: Joi.string().allow("").required(),
+    Mi: Joi.string().allow("").required(),
+    Do: Joi.string().allow("").required(),
+    Fr: Joi.string().allow("").required(),
+});
+
+const user = Joi.object({
+    username: username.required(),
+}).unknown(true);
+
+export default { username, password, user, times };

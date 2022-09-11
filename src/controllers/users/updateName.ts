@@ -11,9 +11,7 @@ export default async (req: Request, res: Response) => {
         name: Joi.string()
             .pattern(/[^ ]+ [^ ].*/)
             .required(),
-        user: Joi.object({
-            username: validationPatterns.username.required(),
-        }).unknown(true), // required username (for pattern see validation/commonPatterns)
+        user: validationPatterns.user, // required user (for pattern see validation/commonPatterns)
     });
 
     // Validate the request body
