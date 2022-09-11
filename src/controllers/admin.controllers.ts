@@ -6,5 +6,6 @@
 import changeAdminState from "./admin/changeAdminState";
 import importUser from "./admin/importUser";
 import getStartPasswords from "./admin/getStartPasswords";
+import getAdmin from "./admin/get_admin";
 
-export default { changeAdminState, importUser, getStartPasswords };
+export default { changeAdminState, importUser, getStartPasswords, getAdmin };

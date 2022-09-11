@@ -19,5 +19,6 @@ router.get(
     isAdmin,
     adminControllers.getStartPasswords
 );
+router.get("/", checkAuth, isAdmin, adminControllers.getAdmin);
 
 export default router;

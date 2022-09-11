@@ -13,7 +13,7 @@ export default async (req: Request, res: Response) => {
             .required(),
         email: Joi.string().email().required(), // email, required
         phonenumber: Joi.string().alphanum().optional(), // phonenumber, optional
-        user: validationPatterns.user, // required username (for pattern see validation/commonPatterns)
+        user: validationPatterns.user, // required user (for pattern see validation/commonPatterns)
     });
 
     // Validate the request body
