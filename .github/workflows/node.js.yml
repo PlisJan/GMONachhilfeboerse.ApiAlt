@@ -26,10 +26,10 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        cache: 'yarn'
         cache-dependency-path: ./docs/package.json
     - run: cd docs
-    - run: npm ci
+    - run: yarn install
     - run: node generateDocs.js
     - run: mkdir build && mv index.html openapi.json build
     
