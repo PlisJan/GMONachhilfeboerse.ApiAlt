@@ -24,7 +24,7 @@ jobs:
         cache-dependency-path: ./docs/package.json
     - run: yarn install
     - run: node docs/generateDocs.js
-    - run: mkdir build && mv index.html openapi.json build
+    - run: mkdir build && mv docs/index.html docs/openapi.json build
     
   deploy:
     environment:
