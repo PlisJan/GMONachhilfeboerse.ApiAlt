@@ -25,15 +25,7 @@ jobs:
     - run: yarn install
     - run: node docs/generateDocs.js
     - run: mkdir build && mv docs/index.html docs/openapi.json build
-    
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
+
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
       with:
