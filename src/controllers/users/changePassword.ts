@@ -6,6 +6,93 @@ import bcrypt from "bcrypt";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ *
+ * /user/changePassword:
+ *   post:
+ *     tags:
+ *       - user
+ *     summary: Change password
+ *     description: Change the password of the current user
+ *     operationId: changePassword
+ *     requestBody:
+ *       description: Provide old and new password to change the password
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 format: password
+ *                 pattern: ((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).*)
+ *                 minLength: 8
+ *                 maxLength: 256
+ *                 example: "MySuperSavePassword4MyUseraccount!"
+ *                 description: Needs to contain at least <br> - 1 lowercase character  <br> - 1 uppercase character <br> - 1 digit <br> - 1 special character
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 pattern: ((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).*)
+ *                 minLength: 8
+ *                 maxLength: 256
+ *                 example: "MySuperSavePassword4MyUseraccount!"
+ *                 description: |
+ *                   Needs to contain at least <br>
+ *                   - 1 lowercase character  <br>
+ *                   - 1 uppercase character <br>
+ *                   - 1 digit <br>
+ *                   - 1 special character <br><br>
+ *                    Must be different from oldPassword
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Successfully changed password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully changed password
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: "#/components/schemas/UserDetails"
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         description: Password incorrect
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   default: Old password incorrect.
+ *
+ *       "404":
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   default: Username does not exists!
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // ################################### Validate input ###################################
 
@@ -56,7 +143,7 @@ export default async (req: Request, res: Response) => {
     // If the user does not exists
     if (!rows || (rows as any).length == 0) {
         // return 400 Conflict
-        res.status(401).json({ error: "Username does not exists!" });
+        res.status(404).json({ error: "Username does not exists!" });
         return;
     }
 
@@ -111,8 +198,7 @@ export default async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Succesfully changed password",
             details: {
-                username: validationResult.value.user.username,
-                email: validationResult.value.email,
+                user: validationResult.value.user,
             },
         });
         return;
@@ -122,8 +208,7 @@ export default async (req: Request, res: Response) => {
     res.status(500).json({
         error: "Could not change password",
         details: {
-            username: validationResult.value.user.username,
-            email: validationResult.value.email,
+            user: validationResult.value.user,
         },
     });
 };

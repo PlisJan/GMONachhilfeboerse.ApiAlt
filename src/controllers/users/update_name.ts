@@ -4,6 +4,66 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ *
+ * /user/name:
+ *   put:
+ *     tags:
+ *       - user
+ *     summary: Update name
+ *     description: Change the name of the current user
+ *     operationId: updateName
+ *     requestBody:
+ *       description: Provide new name to change the old one
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 pattern: "\\s[^ ]"
+ *                 example: Max Mustermann
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Successfully updated name
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully updated
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                       pattern: "^[a-zA-Z0-9]+$"
+ *                       example: "mustmax00"
+ *                       minLength: 5
+ *                       maxLength: 32
+ *                     name:
+ *                       type: string
+ *                       pattern: "\\s[^ ]"
+ *                       example: Max Mustermann
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({

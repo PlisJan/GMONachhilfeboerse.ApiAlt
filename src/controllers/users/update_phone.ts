@@ -4,6 +4,65 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ *
+ * /user/phonenumber:
+ *   put:
+ *     tags:
+ *       - user
+ *     summary: Update phonenumber
+ *     description: Change the phonenumber of the current user
+ *     operationId: updatePhonenumber
+ *     requestBody:
+ *       description: Provide new phonenumber to change the old one
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               phonenumber:
+ *                 type: string
+ *                 example: +49 0000 0000000
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Successfully updated email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully updated
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                       pattern: "^[a-zA-Z0-9]+$"
+ *                       example: "mustmax00"
+ *                       minLength: 5
+ *                       maxLength: 32
+ *                     phonenumber:
+ *                       type: string
+ *                       example: +49 0000 0000000
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({

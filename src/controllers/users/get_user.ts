@@ -3,6 +3,59 @@ import { RowDataPacket } from "mysql2";
 
 import { query } from "services/db";
 
+/**
+ *
+ * @swagger
+ *
+ * /user:
+ *   get:
+ *     tags:
+ *       - user
+ *     summary: Get the own user data
+ *     description: Get the username, name, email and phonenumber of the logged in user
+ *     operationId: get_user
+ *     responses:
+ *       "200":
+ *         description: Successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 username:
+ *                   type: string
+ *                   example: mustermax00
+ *                 name:
+ *                   type: string
+ *                   example: Max Mustermann
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   example: max.mustermann@email.tld
+ *                 phonenumber:
+ *                   type: string
+ *                   example: +49 0000 0000000
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "404":
+ *         description: No user data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: No data exists!
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     const result = await query("SELECT * FROM Users WHERE username=?", [
         req.body.user.username,

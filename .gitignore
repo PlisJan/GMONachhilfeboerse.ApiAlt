@@ -2,3 +2,4 @@
 **/.env
 **/dist
 **/yarn.lock
+docs/openapi.*

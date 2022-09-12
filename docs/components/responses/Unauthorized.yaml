@@ -1,0 +1,21 @@
+description: You are not authorized to access this route
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Access Denied!"
+            details:
+              oneOf:
+                - type: string
+                  default: "No token entered. Please add a Bearer token."
+                - type: string
+                  default: "Wrong token format! Please use a bearer token."
+                - type: string
+                  default: "Invalid token. Please log in to get a new one!"
+              example: "Invalid token. Please log in to get a new one!"

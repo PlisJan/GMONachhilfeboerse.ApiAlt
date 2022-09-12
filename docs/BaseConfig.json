@@ -1,0 +1,50 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "GMO Nachhilfebörse API",
+        "version": "v1.0.1",
+        "description": "This is the documentation of the Nachhilfebörse API",
+        "contact": { "email": "schule@j-plis.de" }
+    },
+    "servers": [
+        { "url": "https://rpl-51485-0.dn.mnsnet.de/nachhilfeboerse/api/" },
+        { "url": "http://localhost/nachhilfeboerse/api/" }
+    ],
+    "tags": [
+        { "name": "user", "description": "Management of the user data" },
+        { "name": "offers", "description": "Manage the give and take offers" },
+        { "name": "subjects", "description": "Manage the subjects" },
+        { "name": "admin", "description": "Do admin things" }
+    ],
+    "components": {
+        "schemas": {
+            "username": { "type": "string", "example": "Max Mustermann" },
+            "UserDetails": { "$ref": "components/schemas/UserDetails.yaml" }
+        },
+        "responses": {
+            "InternalServerError": {
+                "$ref": "components/responses/InternalServerError.yaml"
+            },
+            "InvalidInput": {
+                "$ref": "components/responses/InvalidInput.yaml"
+            },
+            "Unauthorized": {
+                "$ref": "components/responses/Unauthorized.yaml"
+            }
+        },
+        "securitySchemes": {
+            "userLoggedIn": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "You can get the token by requesting to \"[/user/login](#/user/login)\""
+            },
+            "adminLoggedIn": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "It's the token you get when you log in, but you only have admin permissions, <br> if you are marked as admin in the database!"
+            }
+        }
+    }
+}

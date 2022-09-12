@@ -1,0 +1,15 @@
+description: Internal Server Error
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        error:
+          type: object
+          example:
+            "message": "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'value=?' at line 1"
+            "code": "ER_PARSE_ERROR"
+            "errno": 1064
+            "sql": "SELECT * FROM Table WHERE1 value=?"
+            "sqlState": "42000"
+            "sqlMessage": "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'value=?' at line 1"

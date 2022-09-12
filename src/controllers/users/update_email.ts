@@ -4,6 +4,61 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ * /user/email:
+ *    put:
+ *      tags:
+ *        - user
+ *      summary: Update Email
+ *      description: Change the email of the current user
+ *      operationId: updateEmail
+ *      requestBody:
+ *        description: Provide new email to change the old one
+ *        content:
+ *          application/json:
+ *            schema:
+ *              properties:
+ *                email:
+ *                  type: string
+ *                  format: email
+ *                  example: max.mustermann@email.tld
+ *        required: true
+ *
+ *      responses:
+ *        "200":
+ *          description: Successfully updated email
+ *          content:
+ *            application/json:
+ *              schema:
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    default: Succesfully updated
+ *                  details:
+ *                    type: object
+ *                    properties:
+ *                      username:
+ *                        type: string
+ *                        pattern: "^[a-zA-Z0-9]+$"
+ *                        example: "mustmax00"
+ *                        minLength: 5
+ *                        maxLength: 32
+ *                      email:
+ *                        type: string
+ *                        format: email
+ *                        example: max.mustermann@email.tld
+ *        "400":
+ *          $ref: "#/components/responses/InvalidInput"
+ *        "401":
+ *          $ref: "#/components/responses/Unauthorized"
+ *        "500":
+ *          $ref: "#/components/responses/InternalServerError"
+ *      security:
+ *        - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({
