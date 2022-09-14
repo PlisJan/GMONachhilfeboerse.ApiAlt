@@ -1,7 +1,7 @@
 import express from "express";
-import checkAuth from "middleware/checkAuth.middleware";
-import isAdmin from "middleware/isAdmin.middleware";
-import adminControllers from "controllers/admin.controllers";
+import checkAuth from "@/middleware/checkAuth.middleware";
+import isAdmin from "@/middleware/isAdmin.middleware";
+import adminControllers from "@/controllers/admin.controllers";
 const router = express.Router();
 
 // router.post('/signup', adminControllers.adminRegister);

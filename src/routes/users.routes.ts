@@ -1,6 +1,6 @@
 import express from "express";
-import checkAuth from "middleware/checkAuth.middleware";
-import userControllers from "controllers/users.controllers";
+import checkAuth from "@/middleware/checkAuth.middleware";
+import userControllers from "@/controllers/users.controllers";
 const router = express.Router();
 
 router.post("/login", userControllers.userLogin);

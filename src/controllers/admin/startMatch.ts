@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { RowDataPacket } from "mysql2/promise";
 
-import { query } from "services/db";
-import { convertTimes, match } from "services/match";
+import { query } from "@/services/db";
+import { convertTimes, match } from "@/services/match";
 
 /**
  * @swagger

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { RowDataPacket } from "mysql2/promise";
-import { query } from "services/db";
+import { query } from "@/services/db";
 
 export default async function (
     req: Request,

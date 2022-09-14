@@ -3,8 +3,8 @@ import Joi from "joi";
 import { RowDataPacket } from "mysql2/promise";
 import bcrypt from "bcrypt";
 
-import { query } from "services/db";
-import validationPatterns from "validation/commonPatterns";
+import { query } from "@/services/db";
+import validationPatterns from "@/validation/commonPatterns";
 
 /**
  * @swagger

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Joi from "joi";
-import validationPatterns from "validation/commonPatterns";
-import { query } from "services/db";
+import validationPatterns from "@/validation/commonPatterns";
+import { query } from "@/services/db";
 
 /**
  * @swagger

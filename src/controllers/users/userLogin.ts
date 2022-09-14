@@ -3,8 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
 import jwt from "jsonwebtoken";
 import { RowDataPacket } from "mysql2";
-import { query } from "services/db";
-import validationPatterns from "validation/commonPatterns";
+import { query } from "@/services/db";
+import validationPatterns from "@/validation/commonPatterns";
 
 /**
  * @swagger

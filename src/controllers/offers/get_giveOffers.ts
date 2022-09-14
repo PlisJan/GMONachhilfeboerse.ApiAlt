@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { RowDataPacket } from "mysql2/promise";
 
-import { query } from "services/db";
+import { query } from "@/services/db";
 
 /**
  * @swagger
