@@ -1,13 +1,10 @@
-// import bcrypt from "bcrypt";
-// require("../Node.Js-sample-project-structure/node_modules/dotenv").config();
-// import jwt from "jsonwebtoken";
-// import Admin from "../Models/admin";
-
 import changeAdminState from "./admin/changeAdminState";
 import importUser from "./admin/importUser";
 import getStartPasswords from "./admin/getStartPasswords";
 import getAdmin from "./admin/get_admin";
 import startMatch from "./admin/startMatch";
+import clearOffers from "./admin/clearOffers";
+import getMatches from "./admin/getMatches";
 
 export default {
     changeAdminState,
@@ -15,4 +12,6 @@ export default {
     getStartPasswords,
     getAdmin,
     startMatch,
+    clearOffers,
+    getMatches,
 };

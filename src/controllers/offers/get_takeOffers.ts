@@ -3,6 +3,68 @@ import { RowDataPacket } from "mysql2/promise";
 
 import { query } from "services/db";
 
+/**
+ * @swagger
+ *
+ * /offers/take:
+ *   get:
+ *     tags:
+ *       - offers
+ *     summary: Get the TakeOffers
+ *     description: Get all take offers from the loggged in user with the name, email, and phonenumber of the matched opponent
+ *     operationId: getTakeOffer
+ *
+ *     responses:
+ *       "200":
+ *         description: Succesfully got offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 offers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         minimum: 0
+ *                         example: 542
+ *                       matched:
+ *                         type: boolean
+ *                         example: true
+ *                       subject:
+ *                         type: string
+ *                         maxLength: 5
+ *                         example: "DE"
+ *                       times:
+ *                         $ref: "#/components/schemas/Times"
+ *                       name:
+ *                         type: string
+ *                         pattern: "\\s[^ ]"
+ *                         example: Max Mustermann
+ *                       email:
+ *                         type: string
+ *                         format: email
+ *                         example: max.mustermann@email.tld
+ *                       phonenumber:
+ *                         type: string
+ *                         example: +49 0000 0000000
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Request the data from the database
     const result = await query(

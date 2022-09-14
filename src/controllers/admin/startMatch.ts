@@ -86,11 +86,13 @@ export default async (req: Request, res: Response) => {
     // Add the matchings to the Database
     const insertResult = await query(
         // Inserting multiple values at once using deep arrays is not working with query.execute=> using workaround
-        `INSERT INTO  Matches(takeLessons_id, giveLessons_id, time) VALUES ` +
+        `
+        INSERT INTO  Matches(takeLessons_id, giveLessons_id, time) VALUES ` +
             "(?,?,?),".repeat(matchingsData.length / 3 - 1) +
             "(?,?,?)",
 
-        matchingsData
+        matchingsData,
+        true
     );
 
     // If there is a database error

@@ -4,6 +4,66 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ *
+ * /offers/take:
+ *   delete:
+ *     tags:
+ *       - offers
+ *     summary: Delete a take offer
+ *     description: Delete a take offer by id
+ *     operationId: delTakeOffer
+ *     requestBody:
+ *       description: Provide an id to delete the offer
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 minimum: 0
+ *                 example: 542
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Succesfully deleted offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully deleted
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                       pattern: "^[a-zA-Z0-9]+$"
+ *                       example: "mustmax00"
+ *                       minLength: 5
+ *                       maxLength: 32
+ *                     id:
+ *                       type: integer
+ *                       minimum: 0
+ *                       example: 542
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({

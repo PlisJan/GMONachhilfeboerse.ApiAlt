@@ -1,0 +1,21 @@
+properties:
+  Mo:
+    type: string
+    pattern: "[0-9;]+"
+    example: "5;7;11"
+  Di:
+    type: string
+    pattern: "[0-9;]+"
+    example: "5;11"
+  Mi:
+    type: string
+    pattern: "[0-9;]+"
+    example: "9;2"
+  Do:
+    type: string
+    pattern: "[0-9;]+"
+    example: "4"
+  Fr:
+    type: string
+    pattern: "[0-9;]+"
+    example: "4;2;7;11"

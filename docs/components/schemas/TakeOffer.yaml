@@ -1,0 +1,13 @@
+properties:
+  subject:
+    type: string
+    maxLength: 5
+    example: "DE"
+  times:
+    $ref: "./Times.yaml"
+  allowPhone:
+    type: boolean
+    example: false
+  allowEmail:
+    type: boolean
+    example: true

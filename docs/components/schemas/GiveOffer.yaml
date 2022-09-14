@@ -1,0 +1,24 @@
+properties:
+  subject:
+    type: string
+    maxLength: 5
+    example: "DE"
+  times:
+    $ref: "./Times.yaml"
+  allowPhone:
+    type: boolean
+    example: false
+  allowEmail:
+    type: boolean
+    example: true
+  minClass:
+    type: integer
+    minimum: 1
+    maximum: 13
+    example: 6
+  maxClass:
+    type: integer
+    minimum: 1
+    maximum: 13
+    example: 11
+    description: Must be greater than minClass

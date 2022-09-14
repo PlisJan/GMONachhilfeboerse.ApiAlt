@@ -19,7 +19,10 @@
     "components": {
         "schemas": {
             "username": { "type": "string", "example": "Max Mustermann" },
-            "UserDetails": { "$ref": "components/schemas/UserDetails.yaml" }
+            "UserDetails": { "$ref": "components/schemas/UserDetails.yaml" },
+            "GiveOffer": { "$ref": "components/schemas/GiveOffer.yaml" },
+            "TakeOffer": { "$ref": "components/schemas/TakeOffer.yaml" },
+            "Times": { "$ref": "components/schemas/Times.yaml" }
         },
         "responses": {
             "InternalServerError": {

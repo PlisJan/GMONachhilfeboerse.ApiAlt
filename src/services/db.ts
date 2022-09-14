@@ -14,7 +14,7 @@ type error = { result: undefined; error: { message: any } };
 
 dotenv.config();
 
-const dbConfig = {
+const dbConfig: mysql.ConnectionOptions = {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || "3306"),
     user: process.env.DB_USER,
@@ -24,12 +24,23 @@ const dbConfig = {
 
 export async function query(
     sql: string,
-    params?: any
+    params?: any,
+    enableMultipleStatements?: boolean
 ): Promise<result | error> {
     if (!Array.isArray(params)) {
         params = [params];
     }
-    const connection = await mysql.createConnection(dbConfig);
+    let connection: mysql.Connection;
+    if (enableMultipleStatements) {
+        const enabledDBConfig: mysql.ConnectionOptions = JSON.parse(
+            JSON.stringify(dbConfig)
+        );
+        enabledDBConfig.multipleStatements = true;
+        connection = await mysql.createConnection(enabledDBConfig);
+    } else {
+        connection = await mysql.createConnection(dbConfig);
+    }
+
     try {
         const [results] = await connection.execute(sql, params);
         return { result: results, error: undefined };

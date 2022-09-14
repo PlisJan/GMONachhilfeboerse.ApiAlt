@@ -4,6 +4,46 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ * /offers/give:
+ *    post:
+ *      tags:
+ *        - offers
+ *      summary: Add a give offer
+ *      description: Add a new give offer
+ *      operationId: addGiveOffer
+ *      requestBody:
+ *        description: Data needed for creating an offer
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: "#/components/schemas/GiveOffer"
+ *        required: true
+ *
+ *      responses:
+ *        "200":
+ *          description: Successfully created the offer
+ *          content:
+ *            application/json:
+ *              schema:
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    default: Succesfully inserted
+ *                  details:
+ *                    $ref: "#/components/schemas/GiveOffer"
+ *        "400":
+ *          $ref: "#/components/responses/InvalidInput"
+ *        "401":
+ *          $ref: "#/components/responses/Unauthorized"
+ *        "500":
+ *          $ref: "#/components/responses/InternalServerError"
+ *      security:
+ *        - userLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({

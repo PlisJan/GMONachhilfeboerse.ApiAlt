@@ -15,6 +15,5 @@ const options = {
 };
 
 const openapiSpecification = swaggerJsdoc(options);
-console.log(openapiSpecification)
 
 fs.writeFileSync(path.resolve(__dirname,"./openapi.json"), JSON.stringify(openapiSpecification));
