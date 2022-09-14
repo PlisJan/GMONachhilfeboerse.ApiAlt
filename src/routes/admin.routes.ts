@@ -20,5 +20,6 @@ router.get(
     adminControllers.getStartPasswords
 );
 router.get("/", checkAuth, isAdmin, adminControllers.getAdmin);
+router.post("/match", checkAuth, isAdmin, adminControllers.startMatch);
 
 export default router;

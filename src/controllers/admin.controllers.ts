@@ -7,5 +7,12 @@ import changeAdminState from "./admin/changeAdminState";
 import importUser from "./admin/importUser";
 import getStartPasswords from "./admin/getStartPasswords";
 import getAdmin from "./admin/get_admin";
+import startMatch from "./admin/startMatch";
 
-export default { changeAdminState, importUser, getStartPasswords, getAdmin };
+export default {
+    changeAdminState,
+    importUser,
+    getStartPasswords,
+    getAdmin,
+    startMatch,
+};

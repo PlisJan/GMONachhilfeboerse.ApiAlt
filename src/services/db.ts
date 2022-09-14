@@ -29,7 +29,6 @@ export async function query(
     if (!Array.isArray(params)) {
         params = [params];
     }
-
     const connection = await mysql.createConnection(dbConfig);
     try {
         const [results] = await connection.execute(sql, params);
