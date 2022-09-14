@@ -32,5 +32,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:$(date +%s), ghcr.io/${{ github.repository }}:latest, ghcr.io/nhbapi:v1
+          tags: ghcr.io/${{ github.repository }}:${{date +%s}}, ghcr.io/${{ github.repository }}:latest, ghcr.io/nhbapi:v1
           labels: ${{ steps.meta.outputs.labels }}
