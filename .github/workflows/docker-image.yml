@@ -28,9 +28,9 @@ jobs:
           images: ghcr.io/${{ github.repository }}
       
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/${{ github.repository }}:$(date +%s), ghcr.io/${{ github.repository }}:latest, ghcr.io/nhbapi:v1
           labels: ${{ steps.meta.outputs.labels }}
