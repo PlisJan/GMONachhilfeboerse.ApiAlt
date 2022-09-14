@@ -3,6 +3,73 @@ import Joi from "joi";
 import validationPatterns from "validation/commonPatterns";
 import { query } from "services/db";
 
+/**
+ * @swagger
+ *
+ * /admin/changeAdminState:
+ *   post:
+ *     tags:
+ *       - admin
+ *     summary: Change admin state
+ *     description: Make a user an admin or remove ones permissions
+ *     operationId: changeAdminState
+ *     requestBody:
+ *       description: Provide the username and the new admin state of the user
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 pattern: "^[a-zA-Z0-9]+$"
+ *                 example: "mustmax00"
+ *                 minLength: 5
+ *                 maxLength: 32
+ *               adminState:
+ *                 type: boolean
+ *                 example: true
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Successfully updated adminstate
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully updated
+ *                 details:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                       pattern: "^[a-zA-Z0-9]+$"
+ *                       example: "mustmax00"
+ *                       minLength: 5
+ *                       maxLength: 32
+ *                     adminState:
+ *                       type: boolean
+ *                       example: true
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "403":
+ *         $ref: "#/components/responses/Forbidden"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // Create validation schema
     const schema = Joi.object({

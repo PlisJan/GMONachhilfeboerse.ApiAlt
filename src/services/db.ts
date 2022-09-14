@@ -42,9 +42,11 @@ export async function query(
     }
 
     try {
-        const [results] = await connection.execute(sql, params);
+        const [results] = await connection.query(sql, params);
+        connection.end();
         return { result: results, error: undefined };
     } catch (error) {
+        connection.end();
         return { error: { message: error }, result: undefined };
     }
 }

@@ -19,7 +19,6 @@ router.get(
     isAdmin,
     adminControllers.getStartPasswords
 );
-router.get("/", checkAuth, isAdmin, adminControllers.getAdmin);
 router.post("/match", checkAuth, isAdmin, adminControllers.startMatch);
 router.delete("/clearOffers", checkAuth, isAdmin, adminControllers.clearOffers);
 router.get("/match", checkAuth, isAdmin, adminControllers.getMatches);

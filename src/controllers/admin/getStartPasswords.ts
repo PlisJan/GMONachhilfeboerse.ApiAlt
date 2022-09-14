@@ -3,6 +3,58 @@ import { RowDataPacket } from "mysql2/promise";
 
 import { query } from "services/db";
 
+/**
+ *
+ * @swagger
+ *
+ * /admin/getStartPasswords:
+ *   get:
+ *     tags:
+ *       - admin
+ *     summary: Get the start passwords
+ *     description: Get the start password from all users
+ *     operationId: getStartPasswords
+ *     responses:
+ *       "200":
+ *         description: Successfully got passwords
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 startPasswords:
+ *                   type: object
+ *                   example:
+ *                     5a:
+ *                       Benedikt: "ajsod,-opaskdoaskd"
+ *                       Klaus: "sdjfoincvnyxj.,-vpsadjospo"
+ *                     5b:
+ *                       Annette: "asdmaopsmopcpsdoüasdmx"
+ *                       Luisa: "sdmiopxcvpnniwein9q238"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "403":
+ *         $ref: "#/components/responses/Forbidden"
+ *
+ *       "404":
+ *         description: No user data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: No data exists!
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     const result = await query(
         `

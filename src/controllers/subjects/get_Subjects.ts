@@ -3,6 +3,46 @@ import { RowDataPacket } from "mysql2/promise";
 
 import { query } from "services/db";
 
+/**
+ *
+ * @swagger
+ *
+ * /subjects:
+ *   get:
+ *     tags:
+ *       - subjects
+ *     summary: Get all subjects
+ *     description: Get all subjects
+ *     operationId: get_subjects
+ *     responses:
+ *       "200":
+ *         description: Successfully got subjects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 subjects:
+ *                   type: object
+ *                   example:
+ *                     DE: Deutsch
+ *                     EN: Englisch
+ *
+ *       "404":
+ *         description: No user data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: No data exists!
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     const result = await query(
         `

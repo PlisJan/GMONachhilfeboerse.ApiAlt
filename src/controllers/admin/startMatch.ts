@@ -4,6 +4,73 @@ import { RowDataPacket } from "mysql2/promise";
 import { query } from "services/db";
 import { convertTimes, match } from "services/match";
 
+/**
+ * @swagger
+ *
+ * /admin/match:
+ *   post:
+ *     tags:
+ *       - admin
+ *     summary: Start the matching process
+ *     description: |
+ *                  Start the matching process <br>
+ *                  You will not receive any error messages from the matching algorithm or
+ *                  if the program fails to write the output into the database. <br>
+ *                  These Errors will only be logged in the logs of the api server. <br><br>
+ *                  <strong> NOTE: The Matches table in the database is getting cleared while matching.
+ *                   Old matches will be deleted to backup them if you want to keep them</strong>
+ *     operationId: startMatch
+ *     requestBody:
+ *       description: Provide the username and the new admin state of the user
+ *       content:
+ *         application/json:
+ *           schema:
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 pattern: "^[a-zA-Z0-9]+$"
+ *                 example: "mustmax00"
+ *                 minLength: 5
+ *                 maxLength: 32
+ *               adminState:
+ *                 type: boolean
+ *                 example: true
+ *       required: true
+ *
+ *     responses:
+ *       "200":
+ *         description: Successfully updated adminstate
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Matching started
+ *                 convertedTakeOffers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 convertedGiveOffers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "403":
+ *         $ref: "#/components/responses/Forbidden"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     // ********************************* Get GiveLessons Data *********************************
     const giveLessonsResult = await query(
@@ -77,21 +144,16 @@ export default async (req: Request, res: Response) => {
         convertedTakeOffers,
         convertedGiveOffers,
     });
-    // Run the matching (AFTER sending the response to now risk a timeout error)
+    // Run the matching (AFTER sending the response to not risk a timeout error)
     const matched = await match(convertedTakeOffers, convertedGiveOffers);
-
-    // Merge the deep array to a single long one
-    const matchingsData = [].concat(...(matched.matchings as any[]));
 
     // Add the matchings to the Database
     const insertResult = await query(
-        // Inserting multiple values at once using deep arrays is not working with query.execute=> using workaround
         `
-        INSERT INTO  Matches(takeLessons_id, giveLessons_id, time) VALUES ` +
-            "(?,?,?),".repeat(matchingsData.length / 3 - 1) +
-            "(?,?,?)",
+        TRUNCATE TABLE Matches;
+        INSERT INTO  Matches(takeLessons_id, giveLessons_id, time) VALUES ?`,
 
-        matchingsData,
+        [matched.matchings],
         true
     );
 

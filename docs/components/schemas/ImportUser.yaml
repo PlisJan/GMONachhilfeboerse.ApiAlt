@@ -1,0 +1,72 @@
+properties:
+  inserted:
+    type: array
+    items:
+      type: object
+      properties:
+        username:
+          type: string
+          pattern: "^[a-zA-Z0-9]+$"
+          example: "mustmax00"
+          minLength: 5
+          maxLength: 32
+        class_name:
+          type: string
+          minLength: 1
+          maxLength: 10
+          example: "5a"
+  alreadyExistingUsers:
+    type: array
+    items:
+      type: object
+      properties:
+        username:
+          type: string
+          pattern: "^[a-zA-Z0-9]+$"
+          example: "mustmax00"
+          minLength: 5
+          maxLength: 32
+        class_name:
+          type: string
+          minLength: 1
+          maxLength: 10
+          example: "5a"
+  databaseErrors:
+    type: object
+    properties:
+      error:
+        type: any
+        example: Could not connect
+        description: Can ba string or object
+      user:
+        type: array
+        items:
+          type: object
+          properties:
+            username:
+              type: string
+              pattern: "^[a-zA-Z0-9]+$"
+              example: "mustmax00"
+              minLength: 5
+              maxLength: 32
+            class_name:
+              type: string
+              minLength: 1
+              maxLength: 10
+              example: "5a"
+  unknownErrors:
+    type: array
+    items:
+      type: object
+      properties:
+        username:
+          type: string
+          pattern: "^[a-zA-Z0-9]+$"
+          example: "mustmax00"
+          minLength: 5
+          maxLength: 32
+        class_name:
+          type: string
+          minLength: 1
+          maxLength: 10
+          example: "5a"

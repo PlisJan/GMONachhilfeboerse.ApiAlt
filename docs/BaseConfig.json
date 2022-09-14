@@ -22,7 +22,10 @@
             "UserDetails": { "$ref": "components/schemas/UserDetails.yaml" },
             "GiveOffer": { "$ref": "components/schemas/GiveOffer.yaml" },
             "TakeOffer": { "$ref": "components/schemas/TakeOffer.yaml" },
-            "Times": { "$ref": "components/schemas/Times.yaml" }
+            "Times": { "$ref": "components/schemas/Times.yaml" },
+            "ImportUserResponse": {
+                "$ref": "components/schemas/ImportUser.yaml"
+            }
         },
         "responses": {
             "InternalServerError": {
@@ -33,6 +36,9 @@
             },
             "Unauthorized": {
                 "$ref": "components/responses/Unauthorized.yaml"
+            },
+            "Forbidden": {
+                "$ref": "components/responses/Forbidden.yaml"
             }
         },
         "securitySchemes": {

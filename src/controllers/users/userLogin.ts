@@ -102,7 +102,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
     // Query to check if the user already exists in the database
     const result = await query(
-        "SELECT password,name,email,phonenumber FROM Users WHERE username=?",
+        "SELECT password,name,email,phonenumber,admin FROM Users WHERE username=?",
         validationResult.value.username
     );
 
@@ -144,6 +144,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
         email: fetchedRow.email,
         name: fetchedRow.name,
         phonenumber: fetchedRow.phonenumber,
+        admin: fetchedRow.admin == 1,
     };
 
     // Create a json web token with the userData, that expires in 2 hours

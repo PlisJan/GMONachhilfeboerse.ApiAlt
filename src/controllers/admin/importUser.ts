@@ -5,6 +5,67 @@ import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 import { generatePassword } from "services/passwordGenerator";
 
+/**
+ * @swagger
+ *
+ * /admin/import:
+ *   post:
+ *     tags:
+ *       - admin
+ *     summary: Import new users
+ *     description: Insert an array of new users to get imported
+ *     operationId: importUsers
+ *     requestBody:
+ *       description: Provide username and classname to import
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 username:
+ *                   type: string
+ *                   pattern: "^[a-zA-Z0-9]+$"
+ *                   example: "mustmax00"
+ *                   minLength: 5
+ *                   maxLength: 32
+ *                 class_name:
+ *                   type: string
+ *                   minLength: 1
+ *                   maxLength: 10
+ *                   example: "5a"
+ *       required: true
+ *     responses:
+ *       "201":
+ *         description: <strong> SOME </strong> users were imported, this does <strong> NOT </strong> mean, that all users were imported
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ImportUserResponse"
+ *
+ *       "400":
+ *         $ref: "#/components/responses/InvalidInput"
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "403":
+ *         $ref: "#/components/responses/Forbidden"
+ *
+ *
+ *       "500":
+ *         description: No user was imported
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/ImportUserResponse"
+
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response, next: NextFunction) => {
     // ################################### Validate input ###################################
 
@@ -12,7 +73,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     const schema = Joi.array().items(
         Joi.object({
             username: validationPatterns.username.required(), // required username (for pattern see validation/commonPatterns)
-            class_name: Joi.string().alphanum().max(10).min(1).required(), // Integer, is required,
+            class_name: Joi.string().alphanum().max(10).min(1).required(), // String, alphanum, is required,
         })
     );
 

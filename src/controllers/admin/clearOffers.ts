@@ -4,22 +4,44 @@ import Joi from "joi";
 import { query } from "services/db";
 import validationPatterns from "validation/commonPatterns";
 
+/**
+ * @swagger
+ *
+ * /admin/clearOffers:
+ *   delete:
+ *     tags:
+ *       - admin
+ *     summary: Deletes <strong>ALL</strong> GiveOffers, TakeOffers and Matchings
+ *     description: | 
+ *                  Deletes ALL GiveOffers, TakeOffers and Matchings <br> 
+ *                  <h3>USE IT CAREFULLY</h3> <br> 
+ *                  Note: The data will be written into the Tables GiveLessonsOld, TakeLessonsOld, MatchesOld
+ *     operationId: delAllOffers
+
+ *
+ *     responses:
+ *       "200":
+ *         description: Succesfully deleted offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   default: Succesfully cleared
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ */
+
 export default async (req: Request, res: Response) => {
-    // Create validation schema
-    const schema = Joi.object({
-        id: Joi.number().integer().min(0).required(), // id, required
-        user: validationPatterns.user.required(), // required user (for pattern see validation/commonPatterns),
-    });
-    // Validate the request body
-    const validationResult = schema.validate(req.body);
-
-    // If the request body is invalid
-    if (validationResult.error) {
-        // return 400 with the generated error messages
-        res.status(400).json({ error: validationResult.error.message });
-        return;
-    }
-
     // Add the offer to the database
     const dbResult = await query(
         `

@@ -1,0 +1,9 @@
+description: You are not an admin
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          default: "Forbidden! You are not an admin, so you do not have access to this resource!"

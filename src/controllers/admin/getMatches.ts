@@ -3,6 +3,92 @@ import { RowDataPacket } from "mysql2/promise";
 
 import { query } from "services/db";
 
+/**
+ *
+ * @swagger
+ *
+ * /admin/match:
+ *   get:
+ *     tags:
+ *       - admin
+ *     summary: Get the matchings
+ *     description: Get all the matched and unmatched take offers
+ *     operationId: getMatches
+ *     responses:
+ *       "200":
+ *         description: Successfully got matchings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 matches:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       P1Username:
+ *                         type: string
+ *                         pattern: "^[a-zA-Z0-9]+$"
+ *                         example: "mustmia00"
+ *                         minLength: 5
+ *                         maxLength: 32
+ *                       P1Name:
+ *                         type: string
+ *                         pattern: "\\s[^ ]"
+ *                         example: Mia Mustermann
+ *                       P1Class:
+ *                         type: string
+ *                         minLength: 1
+ *                         maxLength: 10
+ *                         example: "5a"
+ *                       Subject:
+ *                         type: string
+ *                         example: DE
+ *                       Time:
+ *                         type: string
+ *                         example: Mi07
+ *                       P2Username:
+ *                         type: string
+ *                         pattern: "^[a-zA-Z0-9]+$"
+ *                         example: "mustmax00"
+ *                         minLength: 5
+ *                         maxLength: 32
+ *                       P2Name:
+ *                         type: string
+ *                         pattern: "\\s[^ ]"
+ *                         example: Max Mustermann
+ *                       P2Class:
+ *                         type: string
+ *                         minLength: 1
+ *                         maxLength: 10
+ *                         example: "5a"
+ *
+ *
+ *       "401":
+ *         $ref: "#/components/responses/Unauthorized"
+ *
+ *       "403":
+ *         $ref: "#/components/responses/Forbidden"
+ *
+ *       "404":
+ *         description: No user data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: No data exists!
+ *
+ *       "500":
+ *         $ref: "#/components/responses/InternalServerError"
+ *
+ *     security:
+ *       - adminLoggedIn: []
+ *
+ *
+ */
+
 export default async (req: Request, res: Response) => {
     const result = await query(
         `
@@ -42,6 +128,6 @@ export default async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-        rows,
+        matches: rows,
     });
 };
